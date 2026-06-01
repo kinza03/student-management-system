@@ -116,8 +116,8 @@ async function apiFetch(endpoint, options = {}) {
 
 async function checkConnectionStatus() {
     try {
-        const data = await apiFetch('/');
-        if (data && data.status === 'online') {
+        const data = await apiFetch('/students');
+        if (Array.isArray(data)) {
             DOM.backendStatusText.innerHTML = "Server connection: Connected 🟢";
             DOM.backendStatusText.previousElementSibling.className = "status-dot online";
         }

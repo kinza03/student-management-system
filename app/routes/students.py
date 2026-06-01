@@ -5,11 +5,32 @@ from typing import List, Optional
 from app.database import get_db
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentUpdate, StudentResponse
+import os
+from google import genai
+from pydantic import BaseModel
+from fastapi import Header
+from dotenv import load_dotenv
 
 router = APIRouter(
     prefix="/students",
     tags=["students"]
 )
+
+# Load environment variables explicitly
+load_dotenv()
+
+def get_gemini_client(override_key: Optional[str] = None):
+    # Order of priority: Header API Key -> Env variables
+    key = override_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not key or key.strip() == "" or key == "your_gemini_api_key_here":
+        return None
+    try:
+        return genai.Client(api_key=key)
+    except Exception:
+        return None
+
+class ChatRequest(BaseModel):
+    question: str
 
 @router.post("", response_model=StudentResponse, status_code=status.HTTP_201_CREATED)
 def create_student(student: StudentCreate, db: Session = Depends(get_db)):
@@ -97,6 +118,11 @@ def read_at_risk_students(db: Session = Depends(get_db)):
             detail=f"Internal server error while analyzing risk: {str(e)}"
         )
 
+@router.get("/gemini-status")
+def get_gemini_status(x_gemini_api_key: Optional[str] = Header(None)):
+    client = get_gemini_client(x_gemini_api_key)
+    return {"status": "configured" if client is not None else "not_configured"}
+
 @router.get("/{id}", response_model=StudentResponse)
 def read_student(id: int, db: Session = Depends(get_db)):
     try:
@@ -174,35 +200,6 @@ def delete_student(id: int, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error while deleting student: {str(e)}"
         )
-
-
-# Gemini AI proxy endpoints
-import os
-from google import genai
-from pydantic import BaseModel
-from fastapi import Header
-from dotenv import load_dotenv
-
-# Load environment variables explicitly
-load_dotenv()
-
-def get_gemini_client(override_key: Optional[str] = None):
-    # Order of priority: Header API Key -> Env variables
-    key = override_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-    if not key or key.strip() == "" or key == "your_gemini_api_key_here":
-        return None
-    try:
-        return genai.Client(api_key=key)
-    except Exception:
-        return None
-
-class ChatRequest(BaseModel):
-    question: str
-
-@router.get("/gemini-status")
-def get_gemini_status(x_gemini_api_key: Optional[str] = Header(None)):
-    client = get_gemini_client(x_gemini_api_key)
-    return {"status": "configured" if client is not None else "not_configured"}
 
 @router.post("/{id}/analyze")
 def analyze_student(id: int, db: Session = Depends(get_db), x_gemini_api_key: Optional[str] = Header(None)):
