@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management Portal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for premium interactive visual charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Marked.js for rendering Gemini Markdown output cleanly -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">🎓</div>
+                <div class="brand-info">
+                    <h2>Academic Portal</h2>
+                    <span>v2.0 Serverless</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <span class="icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" data-tab="students">
+                    <span class="icon">👥</span> Students Directory
+                </button>
+                <button class="nav-item" data-tab="add-student">
+                    <span class="icon">➕</span> Add Student
+                </button>
+                <button class="nav-item" data-tab="ai-assistant">
+                    <span class="icon">🤖</span> AI Assistant
+                </button>
+            </nav>
+
+            <div class="sidebar-key-input-container">
+                <label for="sidebar-api-key">🔑 Gemini API Key:</label>
+                <input type="password" id="sidebar-api-key" placeholder="Enter key (optional)...">
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span id="backend-status-text">Server connection: checking...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-title">
+                    <h1 id="page-title">Dashboard Overview</h1>
+                    <p id="page-subtitle">Real-time educational monitoring, tracking, and student performance insights.</p>
+                </div>
+                <div class="header-actions">
+                    <div class="api-key-badge" id="api-key-status">🔑 Gemini: Checking...</div>
+                </div>
+            </header>
+
+            <!-- TAB 1: Dashboard Tab -->
+            <section class="tab-pane active" id="tab-dashboard">
+                <!-- Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">👥</div>
+                        <div class="metric-content">
+                            <span class="metric-label">Total Students</span>
+                            <h3 id="metric-total-students">-</h3>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📈</div>
+                        <div class="metric-content">
+                            <span class="metric-label">Average Grade</span>
+                            <h3 id="metric-avg-grade">-</h3>
+                        </div>
+                    </div>
+                    <div class="metric-card alert">
+                        <div class="metric-icon">⚠️</div>
+                        <div class="metric-content">
+                            <span class="metric-label">At-Risk Count</span>
+                            <h3 id="metric-at-risk">-</h3>
+                        </div>
+                    </div>
+                    <div class="metric-card success">
+                        <div class="metric-icon">🏆</div>
+                        <div class="metric-content">
+                            <span class="metric-label">Top Performer</span>
+                            <h3 id="metric-top-performer" class="truncate">-</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h4>📊 Grade Distribution</h4>
+                        <div class="chart-container">
+                            <canvas id="gradeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h4>📉 Average Attendance by Course</h4>
+                        <div class="chart-container">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Bottom List Panel -->
+                <div class="lists-grid">
+                    <div class="list-card">
+                        <div class="card-header">
+                            <h4>🏆 Top Performers</h4>
+                        </div>
+                        <div class="list-container" id="top-performers-list">
+                            <div class="list-placeholder">Loading top performers...</div>
+                        </div>
+                    </div>
+
+                    <div class="list-card">
+                        <div class="card-header">
+                            <h4>🚨 At-Risk Alert List</h4>
+                        </div>
+                        <div class="list-container" id="at-risk-list">
+                            <div class="list-placeholder">Loading at-risk list...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: Students Tab -->
+            <section class="tab-pane" id="tab-students">
+                <div class="directory-container">
+                    <div class="search-bar-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="Search by name, student ID, or course to filter list...">
+                    </div>
+
+                    <div class="table-card">
+                        <table class="students-table">
+                            <thead>
+                                <tr>
+                                    <th>DB ID</th>
+                                    <th>Student ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Course</th>
+                                    <th>Grade</th>
+                                    <th>Attendance</th>
+                                    <th>Academic Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body">
+                                <tr>
+                                    <td colspan="9" class="table-placeholder">Loading student directory...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Edit / Update Form Modal Drawer (Hidden by default) -->
+                    <div class="drawer-overlay" id="edit-drawer-overlay">
+                        <div class="drawer">
+                            <div class="drawer-header">
+                                <h3>⚙️ Edit Student Record</h3>
+                                <button class="close-drawer" id="close-edit-drawer">×</button>
+                            </div>
+                            <form id="edit-student-form" class="drawer-form">
+                                <input type="hidden" id="edit-db-id">
+                                <div class="form-group">
+                                    <label for="edit-first-name">First Name*</label>
+                                    <input type="text" id="edit-first-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-last-name">Last Name*</label>
+                                    <input type="text" id="edit-last-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-student-id">Student ID*</label>
+                                    <input type="text" id="edit-student-id" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="edit-course">Course*</label>
+                                    <input type="text" id="edit-course" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group half">
+                                        <label for="edit-grade">Grade</label>
+                                        <select id="edit-grade">
+                                            <option value="A+">A+</option>
+                                            <option value="A">A</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B">B</option>
+                                            <option value="C+">C+</option>
+                                            <option value="C">C</option>
+                                            <option value="D">D</option>
+                                            <option value="F">F</option>
+                                            <option value="Pass">Pass</option>
+                                            <option value="Fail">Fail</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group half">
+                                        <label for="edit-attendance">Attendance (%)</label>
+                                        <input type="range" id="edit-attendance" min="0" max="100" step="0.5">
+                                        <span class="range-value" id="edit-attendance-val">95%</span>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Record</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: Add Student Tab -->
+            <section class="tab-pane" id="tab-add-student">
+                <div class="form-container-grid">
+                    <div class="form-card">
+                        <h3>➕ Register a New Student</h3>
+                        <p class="form-subtitle">Complete the form below to add a new student record to the system.</p>
+                        
+                        <form id="add-student-form">
+                            <div class="form-group">
+                                <label for="add-first-name">First Name*</label>
+                                <input type="text" id="add-first-name" placeholder="e.g. Liam" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="add-last-name">Last Name*</label>
+                                <input type="text" id="add-last-name" placeholder="e.g. Anderson" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="add-student-id">Student ID*</label>
+                                <input type="text" id="add-student-id" placeholder="e.g. S10243" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="add-course">Enrolled Course*</label>
+                                <input type="text" id="add-course" placeholder="e.g. Data Structures" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="add-grade">Current Grade</label>
+                                    <select id="add-grade">
+                                        <option value="A+">A+</option>
+                                        <option value="A">A</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B">B</option>
+                                        <option value="C+">C+</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                        <option value="F">F</option>
+                                        <option value="Pass">Pass</option>
+                                        <option value="Fail">Fail</option>
+                                    </select>
+                                </div>
+                                <div class="form-group half">
+                                    <label for="add-attendance">Attendance Percentage (%)</label>
+                                    <input type="range" id="add-attendance" min="0" max="100" step="0.5" value="95">
+                                    <span class="range-value" id="add-attendance-val">95%</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary full-width">Add Student Record</button>
+                        </form>
+                    </div>
+
+                    <div class="instructions-card">
+                        <h3>Instructions</h3>
+                        <ul>
+                            <li><strong>Student ID</strong>: Must be entirely unique. The API server will reject records with duplicate IDs.</li>
+                            <li><strong>Attendance</strong>: Input the current attendance rate. E.g., 95.0% indicates solid class participation.</li>
+                            <li><strong>Grade</strong>: Select the grade representing the student's current academic status.</li>
+                            <li><strong>Status Badges</strong>: Added students are automatically color-coded on the Students directory:
+                                <ul>
+                                    <li><span class="badge badge-success">On Track</span>: Attendance &ge; 75% and Grade &ge; 70</li>
+                                    <li><span class="badge badge-warning">Needs Attention</span>: Attendance &lt; 75% or Grade &lt; 70 (but not yet At Risk)</li>
+                                    <li><span class="badge badge-danger">At Risk</span>: Attendance &lt; 65% or Grade &lt; 60 ('F'/'Fail')</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class="card-image-placeholder">
+                            <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&auto=format&fit=crop&q=60" alt="Student Academic Portal">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: AI Assistant Tab -->
+            <section class="tab-pane" id="tab-ai-assistant">
+                <div class="ai-container">
+                    <!-- AI Mode Switcher Tabs -->
+                    <div class="ai-tabs">
+                        <button class="ai-tab-btn active" data-subtab="chat">💬 Ask AI (Chat)</button>
+                        <button class="ai-tab-btn" data-subtab="audit">📊 Class Academic Audit</button>
+                        <button class="ai-tab-btn" data-subtab="advisor">👤 Student Advisor</button>
+                    </div>
+
+                    <!-- AI Content Panes -->
+                    <div class="ai-panes">
+                        <!-- Subtab 1: Chat -->
+                        <div class="ai-subpane active" id="ai-subpane-chat">
+                            <div class="chat-header">
+                                <div>
+                                    <h4>Ask Gemini about your class</h4>
+                                    <p>Ask natural language questions about students, courses, overall attendance, or performance trends.</p>
+                                </div>
+                                <button class="btn btn-secondary btn-sm" id="clear-chat-btn">🗑️ Clear Chat History</button>
+                            </div>
+                            
+                            <div class="chat-messages" id="chat-messages-container">
+                                <!-- Messages will render dynamically here -->
+                                <div class="message assistant">
+                                    <div class="msg-avatar">🤖</div>
+                                    <div class="msg-bubble">
+                                        Hello! I'm your Gemini AI Teacher Assistant. Ask me anything about your class performance or student roadmaps.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form id="chat-input-form" class="chat-input-area">
+                                <input type="text" id="chat-input-text" placeholder="Ask a question about the class..." required>
+                                <button type="submit" class="btn btn-primary" id="chat-send-btn">Send ⚡</button>
+                            </form>
+                        </div>
+
+                        <!-- Subtab 2: Audit -->
+                        <div class="ai-subpane" id="ai-subpane-audit">
+                            <h4>Generate Class-Wide AI Evaluation Report</h4>
+                            <p>Request Gemini to compile a complete report outlining class highlights, academic concerns, and strategic intervention recommendations.</p>
+                            
+                            <button class="btn btn-primary full-width" id="btn-generate-audit">📊 Generate AI Analysis Report</button>
+                            
+                            <div class="ai-result-card hidden" id="audit-result-card">
+                                <h3>Generated Report</h3>
+                                <div class="markdown-body" id="audit-report-text"></div>
+                                <button class="btn btn-secondary full-width" id="btn-download-audit">📥 Download Full Report as Text File</button>
+                            </div>
+                        </div>
+
+                        <!-- Subtab 3: Advisor -->
+                        <div class="ai-subpane" id="ai-subpane-advisor">
+                            <h4>Personalized Student Advisor</h4>
+                            <p>Select an individual student from the dropdown below to receive personalized insight and a recommended roadmap.</p>
+                            
+                            <div class="form-group select-container">
+                                <label for="advisor-student-select">Select Student to Analyze</label>
+                                <select id="advisor-student-select">
+                                    <option value="">Choose student to analyze...</option>
+                                    <!-- Dynamic list of students will be populated here -->
+                                </select>
+                            </div>
+
+                            <!-- Student Quick Card -->
+                            <div class="student-profile-card hidden" id="advisor-student-card">
+                                <h3 id="adv-profile-name">Student Profile: -</h3>
+                                <div class="profile-details-grid">
+                                    <div><strong>Student ID:</strong> <span id="adv-profile-id">-</span></div>
+                                    <div><strong>Course:</strong> <span id="adv-profile-course">-</span></div>
+                                    <div><strong>Current Grade:</strong> <span id="adv-profile-grade">-</span></div>
+                                    <div><strong>Attendance Rate:</strong> <span id="adv-profile-attendance">-</span></div>
+                                    <div><strong>Academic Standing:</strong> <span id="adv-profile-standing">-</span></div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary full-width hidden" id="btn-get-advice">🤖 Get Advisor Recommendations</button>
+
+                            <div class="ai-result-card hidden" id="advisor-result-card">
+                                <h3>Gemini's Insight & Recommendations</h3>
+                                <div class="markdown-body" id="advisor-recommendations-text"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- General Toast/Notification element -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
