@@ -6,7 +6,13 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./students.db")
+default_sqlite_url = "sqlite:///./students.db"
+if os.getenv("VERCEL"):
+    # Vercel serverless functions can only write to /tmp.
+    # This keeps the demo deploy running, but data may reset between cold starts.
+    default_sqlite_url = "sqlite:////tmp/students.db"
+
+DATABASE_URL = os.getenv("DATABASE_URL", default_sqlite_url)
 
 # Handle standard postgres:// URLs to be compatible with SQLAlchemy (expects postgresql://)
 if DATABASE_URL.startswith("postgres://"):
