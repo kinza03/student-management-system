@@ -31,6 +31,7 @@ def get_gemini_client(override_key: Optional[str] = None):
 
 class ChatRequest(BaseModel):
     question: str
+    history: Optional[List[dict]] = []
 
 @router.post("", response_model=StudentResponse, status_code=status.HTTP_201_CREATED)
 def create_student(student: StudentCreate, db: Session = Depends(get_db)):
@@ -274,9 +275,16 @@ def ask_ai(chat_req: ChatRequest, db: Session = Depends(get_db), x_gemini_api_ke
         for s in students_list:
             student_list_str += f"- ID: {s.student_id}, Name: {s.first_name} {s.last_name}, Course: {s.course}, Grade: {s.grade}, Attendance: {s.attendance}%\n"
             
+        history_str = ""
+        if getattr(chat_req, 'history', None):
+            history_str = "\nPrevious Conversation History:\n"
+            for msg in chat_req.history:
+                role = "Teacher" if msg.get("role") == "user" else "Assistant"
+                history_str += f"{role}: {msg.get('content')}\n"
+            
         prompt = f"""You are Gemini, an AI Assistant for teachers. You have access to the following class student data:
 {student_list_str}
-
+{history_str}
 The teacher is asking the following question about their class:
 "{chat_req.question}"
 

@@ -5,6 +5,7 @@ const STATE = {
     students: [],
     atRiskStudents: [],
     geminiConfigured: false,
+    chatHistory: [],
     charts: {
         grade: null,
         attendance: null
@@ -101,6 +102,12 @@ function initApp() {
 // --- API COMMUNICATIONS ---
 async function apiFetch(endpoint, options = {}) {
     try {
+        if (!options.headers) options.headers = {};
+        const apiKey = document.getElementById('sidebar-api-key')?.value?.trim();
+        if (apiKey) {
+            options.headers['x-gemini-api-key'] = apiKey;
+        }
+        
         const response = await fetch(endpoint, options);
         if (!response.ok) {
             const errData = await response.json().catch(() => ({}));
@@ -674,10 +681,18 @@ async function handleAIChatSend(e) {
         const data = await apiFetch('/students/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question: question })
+            body: JSON.stringify({ 
+                question: question,
+                history: STATE.chatHistory
+            })
         });
         
         loadingBubble.remove();
+        
+        // Add to history
+        STATE.chatHistory.push({ role: 'user', content: question });
+        STATE.chatHistory.push({ role: 'assistant', content: data.result });
+        
         // Render Response using Marked markdown formatting
         appendMessageBubble(data.result, 'assistant', '🤖');
     } catch (err) {
@@ -707,6 +722,7 @@ function appendMessageBubble(text, role, avatarSymbol, isLoading = false) {
 }
 
 function clearChatHistory() {
+    STATE.chatHistory = [];
     DOM.chatMessagesContainer.innerHTML = `
         <div class="message assistant">
             <div class="msg-avatar">🤖</div>
