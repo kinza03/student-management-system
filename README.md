@@ -1,126 +1,81 @@
-# 🎓 Student Management System with Gemini AI Assistant
+# 🎓 Student Management System
 
-A comprehensive full-stack academic monitoring portal. The application consists of a **FastAPI backend REST API** (running SQLite with SQLAlchemy ORM) and a **Streamlit dashboard frontend** integrated with **Google Gemini AI** (`gemini-2.5-flash`) for classroom insight queries, student-level roadmap recommendations, and automatic academic audit reporting.
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100.0+-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000.svg?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Gemini API](https://img.shields.io/badge/Gemini-AI_Integrated-8E75B2.svg?style=flat&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
 
----
+A robust, full-stack academic monitoring and management portal designed to track student performance, analyze attendance metrics, and provide actionable, AI-driven insights using Google's Gemini LLM.
 
-## 🚀 Quick Start & Installation
+## Architecture & Technology Stack
 
-Follow these steps to set up and run the application locally on Windows (Python 3.12+):
+- **Backend**: FastAPI (Python 3.12)
+- **Database**: SQLite (Local development) / PostgreSQL (Production deployment ready)
+- **ORM**: SQLAlchemy
+- **Frontend**: Vanilla HTML5, CSS3, JavaScript
+- **Data Visualization**: Chart.js
+- **AI Integration**: Google GenAI SDK (Gemini)
+- **Deployment**: Vercel (Serverless) / Render
 
-### 0. Create Your Environment File
-Copy the example environment file:
-```bash
-copy .env.example .env
-```
+## Key Features ✨
 
-Then open `.env` and add your real Gemini API key.
+- **Comprehensive Dashboard**: Real-time analytics on student enrollment, average grades, and early-warning detection for at-risk students.
+- **Student Directory**: A complete CRUD (Create, Read, Update, Delete) interface with intelligent search capabilities and automated academic status evaluation.
+- **Interactive Visualizations**: Dynamic rendering of grade distributions and course attendance metrics.
+- **AI-Powered Assistant**:
+  - **Conversational Queries**: Query the database using natural language to extract specific classroom trends.
+  - **Classroom Audit**: Generate extensive automated reports highlighting class strengths, weaknesses, and intervention strategies.
+  - **Individual Student Advisor**: Obtain personalized roadmaps and recommendations for specific students.
 
-### 1. Install Dependencies
-Install all required Python packages:
-```bash
-pip install -r requirements.txt
-```
+## Local Development Setup
 
-### 2. Configure Environment Variables
-Create a file named `.env` in the root project directory and configure your Gemini API Key:
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-> **Note**: If you don't configure this, you can still temporarily paste your API key directly inside the dashboard's sidebar interface to test the AI capabilities.
+### Prerequisites
+- Python 3.12 or higher
+- Git
 
-### 3. Start the Backend API Server
-Launch the FastAPI server using Uvicorn. This initializes the SQLite database and automatically seeds it with **8 sample students** on startup:
-```bash
-uvicorn app.main:app --reload
-```
-- API Docs (Swagger UI): http://127.0.0.1:8000/docs
-- API Root: http://127.0.0.1:8000/
+### Installation
 
-### 4. Start the Streamlit Dashboard
-Launch the dashboard interface in a separate terminal:
-```bash
-streamlit run dashboard.py
-```
-- Local URL: http://localhost:8501/ (or the port specified in terminal)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/kinza03/student-management-system.git
+   cd student-management-system
+   ```
 
----
+2. **Configure Environment Variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Add your Google Gemini API key to the `.env` file:
+   ```env
+   GEMINI_API_KEY=your_api_key_here
+   ```
+   *(Note: The application also supports securely passing the API key directly via the frontend UI during runtime).*
 
-## 🌐 Deploy as a Live App
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-This repository includes `render.yaml`, which can deploy the FastAPI app and static frontend to Render with a managed PostgreSQL database.
+4. **Launch the Application**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+   The backend API and the static frontend will be served at `http://localhost:8000/`. The database is automatically seeded with sample data upon initialization.
 
-### Deploy on Render
-1. Push this project to GitHub.
-2. Go to [Render](https://render.com/), choose **New +** → **Blueprint**.
-3. Connect your GitHub repository.
-4. Render will detect `render.yaml` and create:
-   - A web service for the FastAPI app.
-   - A PostgreSQL database for live student records.
-5. Add your `GEMINI_API_KEY` when Render asks for the synced secret value.
-6. Deploy.
+## API Documentation
 
-After deployment, Render will give you a public URL that people can open in their browser.
+When running locally, FastAPI automatically generates interactive API documentation.
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
 
-> Note: The included `vercel.json` can run the FastAPI app on Vercel, but SQLite data is not persistent in serverless environments. For a real shared live app, use Render/Railway/Fly.io with PostgreSQL.
+## Production Deployment 🚀
 
----
+### Vercel (Serverless)
+The project includes a `vercel.json` configuration file, optimizing the FastAPI application and static assets for Vercel's serverless environment. 
+*Note: Due to the ephemeral nature of serverless environments, it is highly recommended to configure a remote PostgreSQL database (e.g., Neon or Supabase) via the `DATABASE_URL` environment variable to ensure data persistence.*
 
-## 🐙 Push to GitHub
+### Render (Stateful)
+A `render.yaml` Blueprint is provided for deploying the application alongside a managed, persistent PostgreSQL database.
 
-From the project folder:
-
-```bash
-git init
-git add .
-git commit -m "Initial student management system"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/student-management-system.git
-git push -u origin main
-```
-
-Replace `YOUR_USERNAME` with your GitHub username. Make sure `.env` is not committed; this project includes `.gitignore` to protect it.
-
----
-
-## 📂 Project Directory Structure
-
-```
-student-management-system/
-├── app/
-│   ├── models/
-│   │   └── student.py       # SQLAlchemy Student database model
-│   ├── routes/
-│   │   └── students.py      # CRUD and custom logic routes with try-catch
-│   ├── schemas/
-│   │   └── student.py       # Pydantic models for validation
-│   ├── database.py          # SQLAlchemy database setup and session injection
-│   └── main.py              # FastAPI app creation & DB auto-seeding
-├── .env                     # Environment configuration (Gemini API Key)
-├── dashboard.py             # Streamlit visual dashboard & Gemini integration
-├── requirements.txt         # Project dependencies manifest
-├── students.db              # SQLite Database (generated on startup)
-└── README.md                # Documentation
-```
-
----
-
-## 🛠️ Key Features
-
-### 1. Backend REST API Endpoints
-- `GET /students`: Retrieves all students (supports query search by name/course/ID).
-- `POST /students`: Registers a new student (validates unique ID).
-- `GET /students/{id}`: Retrieves a single student by primary database ID.
-- `PUT /students/{id}`: Updates student details.
-- `DELETE /students/{id}`: Deletes a student record.
-- `GET /students/at-risk`: Returns students with attendance below 65% or grade below 60.
-
-### 2. Streamlit Visual Dashboard
-- **Dashboard Overview**: Key metrics cards (Enrollment, average grade, at-risk count, and top performers) paired with custom-styled Matplotlib graphs for grade distribution and attendance analytics.
-- **Searchable Students Directory**: Directory featuring search-as-you-type filtering, color-coded academic status badges (**🟢 On Track**, **🟡 Needs Attention**, and **🔴 At Risk**), and management forms to update or delete records.
-- **Add Student Registration**: Quick-add student entry form with slide inputs and validation.
-
-### 3. Gemini AI Assistant
-- **Ask AI (Chat)**: A teacher assistant chatbot allowing natural language queries regarding class performance trends.
-- **Class Academic Audit**: Generates an audit highlighting top courses, at-risk trends, class health breakdowns, and downloadable text reports.
-- **Student Advisor**: Displays student profiles and returns a personalized insight and concrete recommendation roadmap.
+## License
+Distributed under the MIT License.
