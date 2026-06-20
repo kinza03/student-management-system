@@ -2,10 +2,12 @@
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100.0+-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
-[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000.svg?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000.svg?style=flat&logo=vercel&logoColor=white)](https://student-management-system-rosy-delta.vercel.app)
 [![Gemini API](https://img.shields.io/badge/Gemini-AI_Integrated-8E75B2.svg?style=flat&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
 
 A streamlined, full-stack academic monitoring portal engineered to track student performance, analyze attendance metrics, and provide actionable, AI-driven insights via Google's Gemini LLM. 🚀
+
+> 🌐 **Live Demo:** [**Experience the Student Management System**](https://student-management-system-rosy-delta.vercel.app)
 
 ## 🏗️ Architecture & Technology Stack
 
