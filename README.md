@@ -5,74 +5,186 @@
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000.svg?style=flat&logo=vercel&logoColor=white)](https://student-management-system-rosy-delta.vercel.app)
 [![Gemini API](https://img.shields.io/badge/Gemini-AI_Integrated-8E75B2.svg?style=flat&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
 
-A streamlined, full-stack academic monitoring portal engineered to track student performance, analyze attendance metrics, and provide actionable, AI-driven insights via Google's Gemini LLM. 🚀
+A full-stack academic management platform engineered to manage student records, monitor academic performance, visualize grades and attendance, and provide AI-powered academic insights using Google's Gemini LLM. 🚀
 
-> 🌐 **Live Demo:** [**Experience the Student Management System**](https://student-management-system-rosy-delta.vercel.app)
+🌐 Live Demo: Experience the Student Management System
 
-## 🏗️ Architecture & Technology Stack
+🏗️ Architecture & Technology Stack
+⚙️ Backend Framework: FastAPI (Python 3.12)
+🗄️ Database Engine: SQLite / PostgreSQL
+🔗 ORM Layer: SQLAlchemy
+🎨 Frontend Layer: Vanilla HTML5, CSS3, JavaScript
+📊 Data Processing: Pandas, NumPy
+📈 Data Visualization: Matplotlib / Chart.js
+🤖 Intelligence Engine: Google GenAI SDK — Gemini 2.5 Flash
+☁️ Deployment: Vercel / Render configuration
+✨ Core Capabilities
+📊 Centralized Dashboard:
+Provides an overview of student enrollment, average class performance, top performers, grade distribution, attendance trends, and students requiring academic attention.
+👥 Student Directory:
+Full CRUD functionality for managing student records, with search capabilities and automated academic status evaluation.
+🎯 Academic Status Evaluation:
+Automatically categorizes students as On Track, Needs Attention, or At Risk based on attendance and academic performance thresholds.
+📈 Data Visualization:
+Presents grade distributions and course-wise attendance through visual analytics for easier academic monitoring.
+🤖 AI-Powered Academic Assistant:
+💬 Conversational Analysis: Ask natural-language questions about available student and class records.
+📝 Automated Academic Audits: Generate class-level reports containing highlights, concerns, and recommendations.
+👤 Personalized Advising: Analyze an individual student's academic performance and generate tailored recommendations.
+📄 Report Generation: Download AI-generated class reports as text files.
+🧠 Academic Status Logic
 
-- **Backend Framework**: FastAPI (Python 3.12)
-- **Database Engine**: SQLite / PostgreSQL (Production deployment ready)
-- **ORM Layer**: SQLAlchemy
-- **Frontend Layer**: Vanilla HTML5, CSS3, JavaScript
-- **Data Visualization**: Chart.js
-- **Intelligence Engine**: Google GenAI SDK (Gemini)
-- **Deployment Platform**: Vercel (Serverless)
+The system uses deterministic rules to identify students who may require intervention:
 
-## ✨ Core Capabilities
+Status	Evaluation
+🔴 At Risk	Attendance < 65%, grade < 60, or F/Fail
+🟡 Needs Attention	Attendance < 75% or grade < 70, but not At Risk
+🟢 On Track	Does not meet the above conditions
 
-- **📊 Centralized Dashboard**: Real-time analytics on student enrollment, average academic scores, and early-warning detection mechanisms for at-risk individuals.
-- **👥 Intelligent Directory**: A frictionless CRUD interface offering dynamic search capabilities and automated student status evaluation.
-- **📈 Data Visualization**: Interactive rendering of classroom grade distributions and overarching attendance trends.
-- **🤖 AI-Powered Academic Assistant**:
-  - **💬 Conversational Analysis**: Interrogate classroom data using natural language queries.
-  - **📝 Automated Audits**: Generate deep-dive analytical reports highlighting institutional strengths, weaknesses, and necessary interventions.
-  - **👤 Personalized Advising**: Obtain tailored academic roadmaps for specific students instantly.
+This rule-based evaluation works alongside the Gemini-powered analysis layer, keeping core academic classification deterministic while using AI for interpretation and recommendations.
 
-## 💻 Local Development Setup
+🤖 AI Integration
 
-### Prerequisites
-- Python 3.12+
-- Git
+The system integrates Google Gemini 2.5 Flash through the Google GenAI SDK.
 
-### Installation Steps
+The AI layer supports three primary workflows:
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/kinza03/student-management-system.git
-   cd student-management-system
-   ```
+💬 Ask AI
 
-2. **Environment Configuration**
-   Create a `.env` file in the root directory and add your Google Gemini API key:
-   ```env
-   GEMINI_API_KEY=your_api_key_here
-   ```
-   *(Note: For security, the system also supports injecting the API key directly via the frontend UI).*
+Users can ask questions about the available classroom records using natural language. The system provides answers based on the student data supplied to the model.
 
-3. **Install Dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+📝 Class Academic Audit
 
-4. **Initialize Server**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-   The backend API and the static frontend will be served at `http://localhost:8000/`. The database auto-seeds sample data upon initial startup.
+The system sends class-level records to Gemini to generate an academic report containing:
 
-## 📖 API Documentation
+Highlights
+Concerns
+Recommendations
+👤 Individual Student Advisor
 
-FastAPI automatically provisions interactive API documentation when running locally:
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
+Individual student records can be analyzed to generate personalized academic insights and concrete recommendations.
 
-## 🌍 Vercel Deployment
+Note: This project uses direct LLM integration with structured student data. It does not use a Retrieval-Augmented Generation (RAG) or vector-database architecture.
 
-This application is strictly optimized for **Vercel Serverless Deployment** ⚡. 
-The included `vercel.json` configuration file seamlessly maps the FastAPI endpoints to Vercel's serverless functions while serving the static frontend assets.
+💻 Local Development Setup
+Prerequisites
+Python 3.12+
+Git
+Google Gemini API key
+Installation
 
-> **Important Data Persistence Note**: Because Vercel serverless functions use an ephemeral `/tmp` filesystem, local SQLite databases will be wiped between cold starts. For persistent production data on Vercel, it is highly recommended to configure a remote PostgreSQL database (such as Neon or Supabase) via the `DATABASE_URL` environment variable.
+1. Clone the repository
+
+git clone https://github.com/kinzasabir/student-management-system.git
+cd student-management-system
+
+2. Create and activate a virtual environment
+
+python -m venv venv
+
+Windows:
+
+venv\Scripts\activate
+
+3. Install dependencies
+
+pip install -r requirements.txt
+
+4. Configure environment variables
+
+Create a .env file in the project root:
+
+GEMINI_API_KEY=your_api_key_here
+DATABASE_URL=sqlite:///./students.db
+
+DATABASE_URL can be configured for PostgreSQL when using an external database.
+
+5. Start the FastAPI application
+
+uvicorn app.main:app --reload
+
+The application will be available at:
+
+http://localhost:8000/
+
+The database automatically seeds sample data when the application starts.
+
+📊 Run the Streamlit Dashboard
+streamlit run dashboard.py
+📖 API Documentation
+
+FastAPI automatically provides interactive API documentation when running locally:
+
+Swagger UI: http://localhost:8000/docs
+ReDoc: http://localhost:8000/redoc
+
+These interfaces can be used to explore and test the available API endpoints.
+
+🌍 Deployment
+
+The repository includes deployment configurations for Vercel and Render.
+
+⚡ Vercel
+
+The included vercel.json configures the FastAPI application for deployment through Vercel.
+
+For persistent production data, an external PostgreSQL database should be used rather than relying on the local SQLite filesystem.
+
+Configure the database through:
+
+DATABASE_URL=your_postgresql_connection_string
+🗄️ Database Persistence
+
+SQLite is convenient for local development, while PostgreSQL is supported for deployments requiring persistent external storage.
+
+📁 Project Structure
+student-management-system/
+│
+├── app/
+│   ├── main.py
+│   └── routes/
+│
+├── dashboard.py
+├── test_chat.py
+├── requirements.txt
+├── .env.example
+├── .gitignore
+├── vercel.json
+├── render.yaml
+├── LICENSE
+└── README.md
+🧩 Engineering Highlights
+
+This project demonstrates practical implementation of:
+
+FastAPI REST API architecture
+SQLAlchemy ORM and relational data management
+CRUD operations and data validation
+Rule-based academic evaluation
+Academic data visualization
+Google Gemini LLM integration
+Natural-language interaction with structured data
+AI-generated academic reports
+Personalized AI recommendations
+Environment-based configuration
+Cloud deployment configuration
+🎯 Project Focus
+
+The goal of this project is to demonstrate how traditional academic management functionality can be combined with modern AI capabilities.
+
+Instead of using AI as a standalone chatbot, the system integrates an LLM into a data-driven application where:
+
+Structured Data → Backend → Analytics & Rules → AI Analysis → Actionable Insights
+
+This creates a practical example of combining software engineering, databases, data analytics, APIs, and generative AI within a single application.
 
 ## 📄 License
 Distributed under the MIT License.
+
+👤 Author
+
+Kinza Sabir
+
+GitHub: kinzasabir
+LinkedIn: kinzasabir
+
