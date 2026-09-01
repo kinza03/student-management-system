@@ -122,7 +122,7 @@ Academic Insights & Recommendations
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/kinza03/student-management-system.git
+git clone https://github.com/kinzasabir/student-management-system.git
 cd student-management-system
 ```
 
@@ -281,5 +281,5 @@ See the [`LICENSE`](LICENSE) file for details.
 
 **Kinza Sabir**
 
-* 💻 **GitHub:** [kinza03](https://github.com/kinza03)
+* 💻 **GitHub:** [kinzasabir](https://github.com/kinzasabir)
 * 🔗 **LinkedIn:** [Kinza Sabir](https://www.linkedin.com/in/kinzasabir/)
